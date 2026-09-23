@@ -5,6 +5,10 @@ import Testing
 /// Hits the real API. Runs only when `TYPESAFE_API_KEY` is set.
 @Suite(.enabled(if: ProcessInfo.processInfo.environment["TYPESAFE_API_KEY"] != nil))
 struct IntegrationTests {
+    /// No-retry tests get one attempt, so allow for a slow first connection
+    /// (seen on GitHub macOS runners, where initial requests exceed 10s).
+    static let noRetryTimeout: Duration = .seconds(30)
+
     @Test func evaluatesAllThreeQuestionTypes() async throws {
         let client = try TypeSafeClient()
         let response = try await client.systemOne(
@@ -44,7 +48,7 @@ struct IntegrationTests {
     }
 
     @Test func validationErrorsCarryTheServerMessage() async throws {
-        let client = try TypeSafeClient(retryPolicy: .noRetries)
+        let client = try TypeSafeClient(timeout: Self.noRetryTimeout, retryPolicy: .noRetries)
         do {
             let levels = (0...10).map { JSONValue("level \($0)") }
             _ = try await client.systemOne(state: "s", questions: ["q": .score("?", criteria: levels)])
@@ -65,7 +69,7 @@ struct IntegrationTests {
     }
 
     @Test func badKeyIs401() async throws {
-        let client = try TypeSafeClient(apiKey: "not-a-key", retryPolicy: .noRetries)
+        let client = try TypeSafeClient(apiKey: "not-a-key", timeout: Self.noRetryTimeout, retryPolicy: .noRetries)
         do {
             _ = try await client.systemOne(state: "s", questions: ["q": .noul("?")])
             Issue.record("expected a 401")
