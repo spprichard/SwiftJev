@@ -31,6 +31,9 @@ jobs:
     container: swift:${{ matrix.swift }}
     steps:
       - uses: actions/checkout@v4
+      # Resolve fresh, as a downstream consumer would; the committed pins can
+      # require a newer tools version than the oldest supported toolchain.
+      - run: rm -f Package.resolved
       - run: swift --version
       - run: swift build
       - run: swift test
