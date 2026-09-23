@@ -1,0 +1,19 @@
+name: Integration Tests
+
+# Manual only: these tests make live API calls.
+on:
+  workflow_dispatch:
+
+jobs:
+  integration:
+    name: Integration (macOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+      - run: swift build
+      - name: Run integration tests
+        run: swift test --filter IntegrationTests
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
