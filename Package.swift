@@ -1,17 +1,21 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.3
 import PackageDescription
 
 let package = Package(
     name: "TypeSafe",
     platforms: [
-        .macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9), .visionOS(.v1),
+        .macOS(.v13),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .watchOS(.v9),
+        .visionOS(.v1),
     ],
     products: [
         .library(name: "TypeSafe", targets: ["TypeSafe"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0"),
-        .package(url: "https://github.com/apple/swift-collections.git", from: "1.1.0"),
+        .package(url: "https://github.com/apple/swift-collections.git", exact: "1.0.6"),
     ],
     targets: [
         .target(
